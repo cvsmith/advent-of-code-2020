@@ -17,7 +17,6 @@ fn main() {
                 let (mut row_lo, mut row_hi) = (0, 127);
                 let (mut col_lo, mut col_hi) = (0, 7);
                 for (i, c) in record.chars().enumerate() {
-                    println!("{}", c);
                     if i < 7 {
                         let row_half_diff = (row_hi - row_lo) / 2;
                         match c {
