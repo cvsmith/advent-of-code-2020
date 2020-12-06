@@ -7,7 +7,7 @@ const ROW_UPPER_CHAR: char = 'B';
 const COL_LOWER_CHAR: char = 'L';
 const COL_UPPER_CHAR: char = 'R';
 
-/// Find number of passports, separated by blank lines, with all required fields
+/// Find max seat ID
 fn main() {
     let mut max_seat_id: i32 = 0;
 
