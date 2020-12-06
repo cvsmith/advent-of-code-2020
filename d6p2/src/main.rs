@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
-/// Find number of "yes" responses to unique questions from each group
+/// Find number of "yes" responses to unique questions from all members of each group
 fn main() {
     let mut count: usize = 0;
 
