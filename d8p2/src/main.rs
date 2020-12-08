@@ -21,7 +21,7 @@ fn main() {
         nop: "nop".to_string(),
     };
 
-    // (instruction, visited)
+    // Get instructions
     let mut instructions: Vec<Instruction> = Vec::new();
     if let Ok(lines) = _read_lines("./input.txt") {
         for line in lines {
