@@ -9,6 +9,7 @@ const OCCUPIED: char = '#';
 struct Position {
     state: char,
     change: bool,
+    n_occupied_directions: u32,
 }
 
 /// Find number of occupied seats after seats stop changing
@@ -22,6 +23,7 @@ fn main() {
                 row.push(Position {
                     state: char,
                     change: false,
+                    n_occupied_directions: 0,
                 });
             }
             grid.push(row);
@@ -41,14 +43,18 @@ fn main() {
                     FLOOR => {}
                     EMPTY => {
                         empty_count += 1;
-                        if _get_n_occupied_directions(&grid, n_rows, n_cols, row, col) == 0 {
+                        grid[row][col].n_occupied_directions =
+                            _get_n_occupied_directions(&grid, n_rows, n_cols, row, col);
+                        if grid[row][col].n_occupied_directions == 0 {
                             seat_changed = true;
                             grid[row][col].change = true;
                         }
                     }
                     OCCUPIED => {
                         occupied_count += 1;
-                        if _get_n_occupied_directions(&grid, n_rows, n_cols, row, col) >= 4 {
+                        grid[row][col].n_occupied_directions =
+                            _get_n_occupied_directions(&grid, n_rows, n_cols, row, col);
+                        if grid[row][col].n_occupied_directions >= 5 {
                             seat_changed = true;
                             grid[row][col].change = true;
                         }
@@ -60,8 +66,7 @@ fn main() {
 
         // Break when there are no more changes
         if !seat_changed {
-            println!("empty: {}, occupied: {}", empty_count, occupied_count);
-            return;
+            break;
         }
 
         // Execute changes
@@ -89,6 +94,7 @@ fn main() {
         empty_count = 0;
         occupied_count = 0;
     }
+    println!("empty: {}, occupied: {}", empty_count, occupied_count);
 }
 
 fn _read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
@@ -106,30 +112,51 @@ fn _get_n_occupied_directions(
     row: usize,
     col: usize,
 ) -> u32 {
-    let mut n_adjacent_occupied = 0;
-
     // Need signed for subtraction
     let (signed_row, signed_col) = (row as i32, col as i32);
 
-    for adj_row in [signed_row - 1, signed_row, signed_row + 1].iter() {
-        for adj_col in [signed_col - 1, signed_col, signed_col + 1].iter() {
-            // Don't check center of subgrid
-            if (*adj_row == signed_row) && (*adj_col == signed_col) {
-                continue;
-            }
+    // Could generate these with loop...
+    let dirs = [
+        (-1, -1),
+        (-1, 0),
+        (-1, 1),
+        (0, -1),
+        (0, 1),
+        (1, -1),
+        (1, 0),
+        (1, 1),
+    ];
+
+    let mut n_occupied_directions = 0;
+    for dir in dirs.iter() {
+        // Check in that direction until out of bounds or occupied
+        let (mut curr_row, mut curr_col) = (signed_row, signed_col);
+        loop {
+            curr_row = curr_row + dir.0;
+            curr_col = curr_col + dir.1;
             // Don't go out of bounds
-            if (*adj_row < 0)
-                || (*adj_col < 0)
-                || (*adj_row >= n_rows as i32)
-                || (*adj_col >= n_cols as i32)
+            if (curr_row < 0)
+                || (curr_col < 0)
+                || (curr_row as usize >= n_rows)
+                || (curr_col as usize >= n_cols)
             {
-                continue;
+                break;
             }
-            // Occupied?
-            if grid[*adj_row as usize][*adj_col as usize].state == OCCUPIED {
-                n_adjacent_occupied += 1;
+            // Stop when occupied
+            match grid[curr_row as usize][curr_col as usize].state {
+                FLOOR => {}
+                EMPTY => {
+                    break;
+                }
+                OCCUPIED => {
+                    n_occupied_directions += 1;
+                    break;
+                }
+                _ => println!("invalid position state"),
             }
         }
     }
-    return n_adjacent_occupied;
+    return n_occupied_directions;
 }
+
+// between 1800 and 3600...
