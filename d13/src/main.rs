@@ -2,11 +2,10 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
-/// Find Manhattan distance from starting point after sequence of navigation instructions
+/// Find earliest bus after arrival time, time to wait, and the product of the two
 fn main() {
     let mut arrival_time: u64 = 0;
     let mut buses: Vec<u64> = Vec::new();
-    // Loop through instructions and change ship state
     if let Ok(lines) = _read_lines("./input.txt") {
         // if let Ok(lines) = _read_lines("./sample.txt") {
         for line in lines {
